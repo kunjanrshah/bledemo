@@ -1,4 +1,4 @@
-package batterydetector;
+package com.krs.demo;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -14,6 +14,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.List;
 import java.util.UUID;
@@ -95,6 +96,9 @@ public class BluetoothLEService extends Service {
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
             Log.d(TAG, "onCharacteristicWrite " + status);
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Toast.makeText(BluetoothLEService.this,"Write "+status,Toast.LENGTH_LONG).show();
+            }
         }
 
         @Override
@@ -218,6 +222,10 @@ public class BluetoothLEService extends Service {
         return true;
     }
 
+    public void writeCharacteristic(@NonNull BluetoothGattCharacteristic bluetoothGattCharacteristic,String input) {
+        bluetoothGattCharacteristic.setValue(input);
+        mBluetoothGatt.writeCharacteristic(bluetoothGattCharacteristic);
+    }
 
     public void readCharacteristic(@NonNull BluetoothGattCharacteristic bluetoothGattCharacteristic) {
         mBluetoothGatt.readCharacteristic(bluetoothGattCharacteristic);

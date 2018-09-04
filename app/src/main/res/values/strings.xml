@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Demo</string>
+    <string name="next">Next</string>
+    <string name="submit">Submit</string>
+    <string name="tare">TARE</string>
+    <string name="export">Export</string>
+    <string name="scan">Scan</string>
 </resources>

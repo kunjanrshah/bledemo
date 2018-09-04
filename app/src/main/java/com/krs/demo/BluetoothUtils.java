@@ -1,4 +1,4 @@
-package batterydetector;
+package com.krs.demo;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;

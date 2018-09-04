@@ -1,4 +1,4 @@
-package batterydetector;
+package com.krs.demo;
 
 import java.util.HashMap;
 
