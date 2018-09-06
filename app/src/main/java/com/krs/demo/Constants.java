@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -34,8 +35,9 @@ public class Constants {
     public static File getFile(String fileName) {
         //Saving file in external storage
         File sdCard = Environment.getExternalStorageDirectory();
+        Log.d("getFile","sdCard: "+sdCard);
         File directory = new File(sdCard.getAbsolutePath() + "/superb");
-
+        Log.d("getFile","directory: "+directory);
         //create directory if not exist
         if (!directory.isDirectory()) {
             directory.mkdirs();
@@ -43,6 +45,7 @@ public class Constants {
 
         //file path
         File file = new File(directory, fileName);
+        Log.d("getFile","file: "+file);
         return file;
     }
 
@@ -81,11 +84,11 @@ public class Constants {
                         String date = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a EEE", Locale.getDefault()).format(new Date());
 
                         sheet.addCell(new Label(0, Integer.parseInt(srno), srno));
-                        sheet.addCell(new Label(1, Integer.parseInt(srno), lot_no));
-                        sheet.addCell(new Label(2, Integer.parseInt(srno), bale_no));
-                        sheet.addCell(new Label(3, Integer.parseInt(srno), gross_wt));
-                        sheet.addCell(new Label(4, Integer.parseInt(srno), tare_wt));
-                        sheet.addCell(new Label(5, Integer.parseInt(srno), net_wt));
+                        sheet.addCell(new Label(1, Integer.parseInt(srno), gross_wt));
+                        sheet.addCell(new Label(2, Integer.parseInt(srno), tare_wt));
+                        sheet.addCell(new Label(3, Integer.parseInt(srno), net_wt));
+                        sheet.addCell(new Label(4, Integer.parseInt(srno), lot_no));
+                        sheet.addCell(new Label(5, Integer.parseInt(srno), bale_no));
                         sheet.addCell(new Label(6, Integer.parseInt(srno), date));
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -108,36 +111,4 @@ public class Constants {
             e.printStackTrace();
         }
     }
-
-
-    public static void ExportAlert(@NonNull final Activity mActivity, @NonNull final File file) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        builder.setTitle(mActivity.getString(R.string.app_name));
-
-        builder.setMessage("Data Exported in a Excel Sheet");
-        builder.setNegativeButton("Share", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(@NonNull DialogInterface dialog, int which) {
-
-                Intent intentShareFile = new Intent(Intent.ACTION_SEND);
-                //  File fileWithinMyDir = new File(myFilePath);
-                intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                if (file.exists()) {
-                    intentShareFile.setType("application/xls");
-                    intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + file.getAbsolutePath() + "/superb"));
-                    intentShareFile.putExtra(Intent.EXTRA_SUBJECT, "Sharing File...");
-                    intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File...");
-                    mActivity.startActivity(Intent.createChooser(intentShareFile, "Share File"));
-                }
-                dialog.dismiss();
-            }
-        });
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(@NonNull DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        }).show();
-    }
-
 }

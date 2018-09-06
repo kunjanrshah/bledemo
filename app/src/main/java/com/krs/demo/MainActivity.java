@@ -21,14 +21,17 @@ import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelUuid;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -53,6 +56,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -213,8 +217,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void displayGattServices(List<BluetoothGattService> gattServices) {
-        if (gattServices == null)
-            return;
+        if (gattServices == null) return;
         String uuid = null;
         String serviceString = "unknown service";
         String charaString = "unknown characteristic";
@@ -226,8 +229,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             serviceString = SampleGattAttributes.lookup(uuid);
 
             if (serviceString != null) {
-                List<BluetoothGattCharacteristic> gattCharacteristics =
-                        gattService.getCharacteristics();
+                List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
 
                 for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                     HashMap<String, String> currentCharaData = new HashMap<String, String>();
@@ -241,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         final int charaProp = mNotifyCharacteristic.getProperties();
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                             mBluetoothLEService.readCharacteristic(mNotifyCharacteristic);
-
                         }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mBluetoothLEService.setCharacteristicNotification(mNotifyCharacteristic, true);
@@ -305,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } catch (Exception e) {
                     e.getMessage();
                 }
-                String filename = "superb_" + edtLotNo.getText() + "_lot.xls";
+                String filename = "superb_" + edtLotNo.getText().toString().trim() + "_lot.xls";
                 if (txtSrNo.getText().toString().equalsIgnoreCase("1")) {
                     Constants.exportToExcel(mjsonobject, filename, true);
                 } else {
@@ -313,6 +314,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 }
                 int no = Integer.parseInt(txtSrNo.getText().toString()) + 1;
                 txtSrNo.setText("" + no);
+                int bale_no = Integer.parseInt(edtBaleNo.getText().toString()) + 1;
+                edtBaleNo.setText("" + bale_no);
                 Toast.makeText(MainActivity.this, "Written in " + filename, Toast.LENGTH_SHORT).show();
             }
         });
@@ -321,13 +324,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onClick(View v) {
                 txtSrNo.setText("1");
-                if (!edtBaleNo.getText().toString().isEmpty()) {
-                    int bale = Integer.parseInt(edtBaleNo.getText().toString()) + 1;
-                    edtBaleNo.setText(bale);
+                edtBaleNo.setText("1");
+                if (!edtLotNo.getText().toString().isEmpty()) {
+                    int lot = Integer.parseInt(edtLotNo.getText().toString()) + 1;
+                    edtLotNo.setText("" + lot);
                 } else {
-                    edtBaleNo.setText("1");
+                    edtLotNo.setText("1");
                 }
-
                 Log.d(TAG, "step btnSubmit");
             }
         });
@@ -341,22 +344,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
                 alertDialogBuilder.setView(promptsView);
                 final EditText userInput = (EditText) promptsView.findViewById(R.id.edtdlgLotNo);
+                userInput.setText(edtLotNo.getText().toString());
                 // set dialog message
-                alertDialogBuilder
-                        .setCancelable(false)
-                        .setPositiveButton("OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        String filename = "superb_" + userInput.getText() + "_lot_number.xls";
-                                        Constants.ExportAlert(MainActivity.this, Constants.getFile(filename));
-                                    }
-                                })
-                        .setNegativeButton("Cancel",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                });
+                alertDialogBuilder.setCancelable(false).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        String filename = "superb_" + userInput.getText().toString().trim() + "_lot.xls";
+                        File file = Constants.getFile(filename);
+                        ExportAlert(file);
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
 
                 // create alert dialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
@@ -368,6 +368,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         textClock.setFormat12Hour("dd/MM/yyyy hh:mm:ss a EEE");
         textClock.setFormat24Hour(null);
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
 
 
     }
@@ -393,20 +396,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onResume() {
         super.onResume();
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    Constants.REQUEST_LOCATION_ENABLE_CODE);
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_LOCATION_ENABLE_CODE);
         }
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
         } else {
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    1);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -441,8 +438,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             case 1: {
 
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
@@ -465,6 +461,38 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onPause();
         unregisterReceiver(mReceiver);
         unregisterReceiver(mGattUpdateReceiver);
+    }
+
+    private void ExportAlert(final File file) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(getString(R.string.app_name));
+
+        builder.setMessage("Data Exported in a Excel Sheet");
+        builder.setNegativeButton("Share", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(@NonNull DialogInterface dialog, int which) {
+
+
+                Uri photoURI = FileProvider.getUriForFile(MainActivity.this, getApplicationContext().getPackageName() + ".provider", file);
+
+                Intent intentShareFile = new Intent(Intent.ACTION_SEND);
+                intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                if (file.exists()) {
+                    intentShareFile.setType("application/xls");
+                    intentShareFile.putExtra(Intent.EXTRA_STREAM, photoURI);
+                    intentShareFile.putExtra(Intent.EXTRA_SUBJECT, "Sharing File...");
+                    intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File...");
+                    startActivity(Intent.createChooser(intentShareFile, "Share File"));
+                }
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(@NonNull DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).show();
     }
 
     private void startScanning(final boolean enable) {
