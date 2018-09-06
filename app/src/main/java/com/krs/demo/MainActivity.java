@@ -1,6 +1,7 @@
 package com.krs.demo;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -19,11 +20,13 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -37,16 +40,48 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
-
+    final static int REQUEST_LOCATION = 199;
     private static final String TAG = "MainActivity";
+    public final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
+                    alert();
+                }
+            }if(LocationManager.PROVIDERS_CHANGED_ACTION.equals(action))
+            {
+                mGoogleApiClient = new GoogleApiClient.Builder(MainActivity.this)
+                        .addApi(LocationServices.API)
+                        .addConnectionCallbacks(MainActivity.this)
+                        .addOnConnectionFailedListener(MainActivity.this).build();
+                mGoogleApiClient.connect();
+            }
+        }
+    };
+    LocationRequest mLocationRequest;
+    GoogleApiClient mGoogleApiClient;
+    PendingResult<LocationSettingsResult> result;
     BluetoothDevice bluetoothDevice;
     Button btnScan, btnTare;
     private BluetoothAdapter mBluetoothAdapter;
@@ -62,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
             }
-            txtStatus.setText("Connecting device step2");
+            txtStatus.setText("Connecting device...");
             btnTare.setEnabled(true);
             mBluetoothLEService.connect(bluetoothDevice.getAddress());
         }
@@ -112,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
             }
-            txtStatus.setText("Connecting device step1");
+            txtStatus.setText("Connecting device..");
             //  startScanning(false);
 
 
@@ -136,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
     private static IntentFilter GattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothLEService.ACTION_GATT_CONNECTED);
@@ -143,6 +179,18 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BluetoothLEService.ACTION_DATA_AVAILABLE);
         return intentFilter;
+    }
+
+    public static boolean setBluetooth(boolean enable) {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        boolean isEnabled = bluetoothAdapter.isEnabled();
+        if (enable && !isEnabled) {
+            return bluetoothAdapter.enable();
+        } else if (!enable && isEnabled) {
+            return bluetoothAdapter.disable();
+        }
+        // No need to change bluetooth state
+        return true;
     }
 
     private void updateConnectionState(final String status) {
@@ -225,7 +273,11 @@ public class MainActivity extends AppCompatActivity {
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startScanning(true);
+                try {
+                    startScanning(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         findViewById(R.id.btnTare).setOnClickListener(new View.OnClickListener() {
@@ -251,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
                     mjsonobject.put("tare_wt", edt_tare_wt.getText().toString());
                     mjsonobject.put("net_wt", edt_net_wt.getText().toString());
                 } catch (Exception e) {
-                    e.getMessage().toString();
+                    e.getMessage();
                 }
                 String filename = "superb_" + edtLotNo.getText() + "_lot.xls";
                 if (txtSrNo.getText().toString().equalsIgnoreCase("1")) {
@@ -316,6 +368,26 @@ public class MainActivity extends AppCompatActivity {
 
         textClock.setFormat12Hour("dd/MM/yyyy hh:mm:ss a EEE");
         textClock.setFormat24Hour(null);
+
+
+    }
+
+    private void alert() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                //set icon
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                //set title
+                .setTitle("Vastipatrak")
+                //set message
+                .setMessage("Please turn on Bluetooth")
+                //set positive button
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        setBluetooth(true);
+                    }
+                })
+                .show();
     }
 
     @Override
@@ -337,7 +409,6 @@ public class MainActivity extends AppCompatActivity {
                     1);
         }
 
-
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, "Your devices that don't support BLE", Toast.LENGTH_LONG).show();
             finish();
@@ -353,6 +424,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         registerReceiver(mGattUpdateReceiver, GattUpdateIntentFilter());
+        registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        registerReceiver(mReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this).build();
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -384,7 +463,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
+        unregisterReceiver(mReceiver);
+        unregisterReceiver(mGattUpdateReceiver);
     }
 
     private void startScanning(final boolean enable) {
@@ -401,14 +481,19 @@ public class MainActivity extends AppCompatActivity {
                     mScanning = false;
                     btnScan.setText("Start");
                     txtStatus.setText("Scanning Stopped");
-                    bluetoothLeScanner.stopScan(scanCallback);
+                    if (bluetoothLeScanner != null) {
+                        bluetoothLeScanner.stopScan(scanCallback);
+                    }
                 }
             }, Constants.SCAN_PERIOD);
 
             mScanning = true;
             btnScan.setText("Stop");
             txtStatus.setText("Scanning Started");
-            bluetoothLeScanner.startScan(scanFilters, settings, scanCallback);
+            if (bluetoothLeScanner != null) {
+                bluetoothLeScanner.startScan(scanFilters, settings, scanCallback);
+            }
+
         } else {
 
             mHandler.post(new Runnable() {
@@ -417,10 +502,97 @@ public class MainActivity extends AppCompatActivity {
                     mScanning = false;
                     btnScan.setText("Start");
                     txtStatus.setText("Scanning Stopped");
-                    bluetoothLeScanner.stopScan(scanCallback);
+                    if (bluetoothLeScanner != null) {
+                        bluetoothLeScanner.stopScan(scanCallback);
+                    }
                 }
             });
 
+        }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(30 * 1000);
+        mLocationRequest.setFastestInterval(5 * 1000);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        builder.setAlwaysShow(true);
+
+        result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                //final LocationSettingsStates state = result.getLocationSettingsStates();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        // All location settings are satisfied. The client can initialize location
+                        // requests here.
+                        //...
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the user
+                        // a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(MainActivity.this, REQUEST_LOCATION);
+                        } catch (Exception e) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        //...
+                        break;
+                }
+            }
+        });
+
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d("onActivityResult()", Integer.toString(resultCode));
+
+        //final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
+        switch (requestCode) {
+            case REQUEST_LOCATION:
+                switch (resultCode) {
+                    case Activity.RESULT_OK: {
+                        // All required changes were successfully made
+                        Toast.makeText(MainActivity.this, "Location enabled by user!", Toast.LENGTH_LONG).show();
+                        break;
+                    }
+                    case Activity.RESULT_CANCELED: {
+                        // The user was asked to change settings, but chose not to
+                        Toast.makeText(MainActivity.this, "Location not enabled, user cancelled.", Toast.LENGTH_LONG).show();
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                break;
         }
     }
 }
