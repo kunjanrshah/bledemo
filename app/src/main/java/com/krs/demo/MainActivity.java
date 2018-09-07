@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelUuid;
@@ -57,6 +58,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     final static int REQUEST_LOCATION = 199;
     private static final String TAG = "MainActivity";
+    private static DecimalFormat df2 = new DecimalFormat("###.###");
+    LocationRequest mLocationRequest;
+    GoogleApiClient mGoogleApiClient;
     public final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -73,8 +78,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
                     alert();
                 }
-            }if(LocationManager.PROVIDERS_CHANGED_ACTION.equals(action))
-            {
+            }
+            if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(action)) {
                 mGoogleApiClient = new GoogleApiClient.Builder(MainActivity.this)
                         .addApi(LocationServices.API)
                         .addConnectionCallbacks(MainActivity.this)
@@ -83,14 +88,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         }
     };
-    LocationRequest mLocationRequest;
-    GoogleApiClient mGoogleApiClient;
     PendingResult<LocationSettingsResult> result;
     BluetoothDevice bluetoothDevice;
     Button btnScan, btnTare;
     private BluetoothAdapter mBluetoothAdapter;
     private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtLotNo = null, edtBaleNo = null;
-    private TextView txtStatus = null, txtSrNo = null;
+    private TextView txtSrNo = null;
     private TextClock textClock = null;
     private BluetoothLEService mBluetoothLEService;
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -101,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
             }
-            txtStatus.setText("Connecting device...");
+            btnScan.setText("Connecting device...");
             btnTare.setEnabled(true);
             mBluetoothLEService.connect(bluetoothDevice.getAddress());
         }
@@ -124,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 invalidateOptionsMenu();
             } else if (BluetoothLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
-                edt_gross_wt.setText("OFF");
                 updateConnectionState("disconnected");
                 //clearUI();
             } else if (BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
@@ -141,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            txtStatus.setText("Finding device");
+            btnScan.setText("Finding device");
             // if(bluetoothDevice.getAddress().equalsIgnoreCase("C8:FD:19:4B:1F:09"))
             //{
             if (mScanning) {
@@ -151,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
             }
-            txtStatus.setText("Connecting device..");
+            btnScan.setText("Connecting device..");
             //  startScanning(false);
 
 
@@ -174,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             // progressBar.setVisibility(View.INVISIBLE);
         }
     };
-
 
     private static IntentFilter GattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -201,18 +202,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                txtStatus.setText(status);
+                btnScan.setText(status);
             }
         });
     }
 
     private void displayData(byte[] data) {
-        if (data != null) {
-            String output = "";
-            for (int i = 0; i < data.length; i++) {
-                output = output + Character.toString((char) data[i]);
-                edt_gross_wt.setText(output);
+        try {
+            if (data != null) {
+                String output = "";
+                for (int i = 0; i < data.length; i++) {
+                    output = output + Character.toString((char) data[i]);
+                    edt_gross_wt.setText(output);
+                    Double net = 0.0d;
+                    if (!edt_tare_wt.getText().toString().isEmpty()) {
+                        net = Double.parseDouble(output) - Double.parseDouble(edt_tare_wt.getText().toString());
+                    }
+                    edt_net_wt.setText("" + df2.format(net));
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -266,22 +276,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         edt_tare_wt = (EditText) findViewById(R.id.edt_tare_wt);
         edtLotNo = (EditText) findViewById(R.id.edtLotNo);
         edtBaleNo = (EditText) findViewById(R.id.edtBaleNo);
-        txtStatus = (TextView) findViewById(R.id.txtStatus);
         btnScan = (Button) findViewById(R.id.btnScan);
-
+        btnTare = (Button) findViewById(R.id.btnTare);
         mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(MainActivity.this);
         bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    startScanning(true);
+                    if (btnScan.getText().toString().equalsIgnoreCase("connected")) {
+                        mBluetoothLEService.disconnect();
+                        mBluetoothLEService.close();
+                       /* mBluetoothLEService.close();
+                        mBluetoothLEService=null;*/
+                        btnScan.setText("disconnected");
+                        Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (mBluetoothLEService != null) {
+                            mBluetoothLEService.connect("C8:FD:19:4B:1F:09");
+                        } else {
+                            startScanning(true);
+                        }
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-        findViewById(R.id.btnTare).setOnClickListener(new View.OnClickListener() {
+        btnTare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mNotifyCharacteristic != null) {
@@ -380,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 //set icon
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 //set title
-                .setTitle("Vastipatrak")
+                .setTitle(getResources().getString(R.string.app_name))
                 //set message
                 .setMessage("Please turn on Bluetooth")
                 //set positive button
@@ -484,12 +506,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     intentShareFile.putExtra(Intent.EXTRA_SUBJECT, "Sharing File...");
                     intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing File...");
                     startActivity(Intent.createChooser(intentShareFile, "Share File"));
+                } else {
+                    Toast.makeText(MainActivity.this, "File is not exist", Toast.LENGTH_SHORT).show();
                 }
                 dialog.dismiss();
             }
         });
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("View", new DialogInterface.OnClickListener() {
             public void onClick(@NonNull DialogInterface dialog, int which) {
+                //File file = new File(Environment.getExternalStorageDirectory()+ "/superb/" + filename);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.fromFile(file),"application/vnd.ms-excel");
+                startActivity(intent);
                 dialog.dismiss();
             }
         }).show();
@@ -507,8 +535,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 @Override
                 public void run() {
                     mScanning = false;
-                    btnScan.setText("Start");
-                    txtStatus.setText("Scanning Stopped");
+                    if (!btnScan.getText().toString().equalsIgnoreCase("connected")) {
+                        btnScan.setText("Scanning Stopped");
+                    }
                     if (bluetoothLeScanner != null) {
                         bluetoothLeScanner.stopScan(scanCallback);
                     }
@@ -516,8 +545,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }, Constants.SCAN_PERIOD);
 
             mScanning = true;
-            btnScan.setText("Stop");
-            txtStatus.setText("Scanning Started");
+            btnScan.setText("Scanning Started");
             if (bluetoothLeScanner != null) {
                 bluetoothLeScanner.startScan(scanFilters, settings, scanCallback);
             }
@@ -528,8 +556,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 @Override
                 public void run() {
                     mScanning = false;
-                    btnScan.setText("Start");
-                    txtStatus.setText("Scanning Stopped");
+                    btnScan.setText("Scanning Stopped");
                     if (bluetoothLeScanner != null) {
                         bluetoothLeScanner.stopScan(scanCallback);
                     }
