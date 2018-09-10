@@ -10,11 +10,10 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Type Lot Number : "
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
-        android:id="@+id/edtdlgLotNo"
+        android:id="@+id/edtInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 

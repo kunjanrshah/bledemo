@@ -66,21 +66,21 @@ public class Constants {
                 sheet = copy.getSheet(0);
             }
             try {
-                sheet.addCell(new Label(0, 0, "Sr. No.")); // column and row
-                sheet.addCell(new Label(1, 0, "Gross Wt"));
-                sheet.addCell(new Label(2, 0, "Tare Wt"));
-                sheet.addCell(new Label(3, 0, "Net Wt"));
-                sheet.addCell(new Label(4, 0, "Lot no"));
-                sheet.addCell(new Label(5, 0, "Bale no"));
+                sheet.addCell(new Label(0, 0, MainActivity.txt_title1.getText().toString())); // column and row
+                sheet.addCell(new Label(1, 0, MainActivity.txt_title4.getText().toString()));
+                sheet.addCell(new Label(2, 0, MainActivity.txt_title5.getText().toString()));
+                sheet.addCell(new Label(3, 0, MainActivity.txt_title6.getText().toString()));
+                sheet.addCell(new Label(4, 0, MainActivity.txt_title2.getText().toString()));
+                sheet.addCell(new Label(5, 0, MainActivity.txt_title3.getText().toString()));
                 sheet.addCell(new Label(6, 0, "Date"));
                 if (mjson != null) {
                     try {
-                        String srno = mjson.getString("sr_no");
-                        String lot_no = mjson.getString("lot_no");
-                        String bale_no = mjson.getString("bale_no");
-                        String gross_wt = mjson.getString("gross_wt");
-                        String tare_wt = mjson.getString("tare_wt");
-                        String net_wt = mjson.getString("net_wt");
+                        String srno = mjson.getString(MainActivity.txt_title1.getText().toString());
+                        String lot_no = mjson.getString(MainActivity.txt_title2.getText().toString());
+                        String bale_no = mjson.getString(MainActivity.txt_title3.getText().toString());
+                        String gross_wt = mjson.getString(MainActivity.txt_title4.getText().toString());
+                        String tare_wt = mjson.getString(MainActivity.txt_title5.getText().toString());
+                        String net_wt = mjson.getString(MainActivity.txt_title6.getText().toString());
                         String date = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a EEE", Locale.getDefault()).format(new Date());
 
                         sheet.addCell(new Label(0, Integer.parseInt(srno), srno));

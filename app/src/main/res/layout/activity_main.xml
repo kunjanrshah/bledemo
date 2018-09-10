@@ -30,6 +30,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/txt_title1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sr. No"
@@ -55,6 +56,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/txt_title2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Lot No"
@@ -62,12 +64,12 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/edtLotNo"
+                android:id="@+id/edt_title2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:inputType="number"
-                android:text="565"
+                android:text="1"
                 android:textSize="18sp"
                 tools:ignore="LabelFor" />
 
@@ -88,12 +90,12 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/edtBaleNo"
+                android:id="@+id/edt_title3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:inputType="number"
-                android:text="515"
+                android:text="1"
                 android:textSize="18sp"
                 tools:ignore="LabelFor" />
 
@@ -117,6 +119,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/txt_title3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gross Wt"
@@ -130,7 +133,7 @@
                 android:focusableInTouchMode="false"
                 android:gravity="center"
                 android:inputType="numberDecimal"
-                android:text="5.52"
+                android:text="0.00"
                 android:textSize="18sp" />
 
         </LinearLayout>
@@ -144,6 +147,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/txt_title4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tare Wt"
@@ -156,7 +160,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:inputType="numberDecimal"
-                android:text="2.00"
+                android:text="0.00"
                 android:textSize="18sp" />
 
         </LinearLayout>
@@ -169,6 +173,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/txt_title5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Net Wt"
@@ -182,7 +187,7 @@
                 android:focusableInTouchMode="false"
                 android:gravity="center"
                 android:inputType="numberDecimal"
-                android:text="3.52"
+                android:text="0.00"
                 android:textSize="18sp"
                 tools:ignore="LabelFor" />
 
@@ -194,18 +199,54 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnScan"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_marginTop="10dp"
-            android:text="@string/scan"
-            tools:ignore="ButtonStyle" />
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnScan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/scan"
+                tools:ignore="ButtonStyle" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txt_title6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Material"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/edt_material"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:focusableInTouchMode="false"
+                    android:gravity="center"
+                    android:inputType="text"
+                    android:textSize="18sp"
+                    tools:ignore="LabelFor" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"

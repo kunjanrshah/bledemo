@@ -23,7 +23,6 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelUuid;
@@ -64,7 +63,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,View.OnClickListener {
 
     final static int REQUEST_LOCATION = 199;
     private static final String TAG = "MainActivity";
@@ -92,8 +91,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     BluetoothDevice bluetoothDevice;
     Button btnScan, btnTare;
     private BluetoothAdapter mBluetoothAdapter;
-    private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtLotNo = null, edtBaleNo = null;
-    private TextView txtSrNo = null;
+    private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtTitle2 = null, edtTitle3 = null;
+    public static TextView txtSrNo = null,txt_title1=null,txt_title2=null,txt_title3=null,txt_title4=null,txt_title5=null,txt_title6=null;
     private TextClock textClock = null;
     private BluetoothLEService mBluetoothLEService;
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -264,22 +263,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
+    private void MemoryAllocation()
+    {
+        textClock = (TextClock) findViewById(R.id.textClock);
+        txtSrNo = (TextView) findViewById(R.id.txtSrNo);
+        txt_title1 = (TextView) findViewById(R.id.txt_title1);
+        txt_title2 = (TextView) findViewById(R.id.txt_title2);
+        txt_title3 = (TextView) findViewById(R.id.txt_title3);
+        txt_title4 = (TextView) findViewById(R.id.txt_title4);
+        txt_title5 = (TextView) findViewById(R.id.txt_title5);
+        txt_title6 = (TextView) findViewById(R.id.txt_title6);
+        edt_gross_wt = (EditText) findViewById(R.id.edt_gross_wt);
+        edt_net_wt = (EditText) findViewById(R.id.edt_net_wt);
+        edt_tare_wt = (EditText) findViewById(R.id.edt_tare_wt);
+        edtTitle2 = (EditText) findViewById(R.id.edt_title2);
+        edtTitle3 = (EditText) findViewById(R.id.edt_title3);
+        btnScan = (Button) findViewById(R.id.btnScan);
+        btnTare = (Button) findViewById(R.id.btnTare);
+        mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(MainActivity.this);
+        bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        txt_title1.setOnClickListener(this);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-        textClock = (TextClock) findViewById(R.id.textClock);
-        txtSrNo = (TextView) findViewById(R.id.txtSrNo);
-        edt_gross_wt = (EditText) findViewById(R.id.edt_gross_wt);
-        edt_net_wt = (EditText) findViewById(R.id.edt_net_wt);
-        edt_tare_wt = (EditText) findViewById(R.id.edt_tare_wt);
-        edtLotNo = (EditText) findViewById(R.id.edtLotNo);
-        edtBaleNo = (EditText) findViewById(R.id.edtBaleNo);
-        btnScan = (Button) findViewById(R.id.btnScan);
-        btnTare = (Button) findViewById(R.id.btnTare);
-        mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(MainActivity.this);
-        bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        MemoryAllocation();
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -319,16 +330,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(View v) {
                 JSONObject mjsonobject = new JSONObject();
                 try {
-                    mjsonobject.put("sr_no", txtSrNo.getText().toString());
-                    mjsonobject.put("lot_no", edtLotNo.getText().toString());
-                    mjsonobject.put("bale_no", edtBaleNo.getText().toString());
-                    mjsonobject.put("gross_wt", edt_gross_wt.getText().toString());
-                    mjsonobject.put("tare_wt", edt_tare_wt.getText().toString());
-                    mjsonobject.put("net_wt", edt_net_wt.getText().toString());
+                    mjsonobject.put(txt_title1.getText().toString(), txtSrNo.getText().toString());
+                    mjsonobject.put(txt_title2.getText().toString(), edtTitle2.getText().toString());
+                    mjsonobject.put(txt_title3.getText().toString(), edtTitle3.getText().toString());
+                    mjsonobject.put(txt_title4.getText().toString(), edt_gross_wt.getText().toString());
+                    mjsonobject.put(txt_title5.getText().toString(), edt_tare_wt.getText().toString());
+                    mjsonobject.put(txt_title6.getText().toString(), edt_net_wt.getText().toString());
                 } catch (Exception e) {
                     e.getMessage();
                 }
-                String filename = "superb_" + edtLotNo.getText().toString().trim() + "_lot.xls";
+                String filename = "superb_" + edtTitle2.getText().toString().trim() + "_lot.xls";
                 if (txtSrNo.getText().toString().equalsIgnoreCase("1")) {
                     Constants.exportToExcel(mjsonobject, filename, true);
                 } else {
@@ -336,8 +347,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 }
                 int no = Integer.parseInt(txtSrNo.getText().toString()) + 1;
                 txtSrNo.setText("" + no);
-                int bale_no = Integer.parseInt(edtBaleNo.getText().toString()) + 1;
-                edtBaleNo.setText("" + bale_no);
+                int bale_no = Integer.parseInt(edtTitle3.getText().toString()) + 1;
+                edtTitle3.setText("" + bale_no);
                 Toast.makeText(MainActivity.this, "Written in " + filename, Toast.LENGTH_SHORT).show();
             }
         });
@@ -346,12 +357,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onClick(View v) {
                 txtSrNo.setText("1");
-                edtBaleNo.setText("1");
-                if (!edtLotNo.getText().toString().isEmpty()) {
-                    int lot = Integer.parseInt(edtLotNo.getText().toString()) + 1;
-                    edtLotNo.setText("" + lot);
+                edtTitle3.setText("1");
+                if (!edtTitle2.getText().toString().isEmpty()) {
+                    int lot = Integer.parseInt(edtTitle2.getText().toString()) + 1;
+                    edtTitle2.setText("" + lot);
                 } else {
-                    edtLotNo.setText("1");
+                    edtTitle2.setText("1");
                 }
                 Log.d(TAG, "step btnSubmit");
             }
@@ -365,8 +376,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 View promptsView = li.inflate(R.layout.prompts, null);
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
                 alertDialogBuilder.setView(promptsView);
-                final EditText userInput = (EditText) promptsView.findViewById(R.id.edtdlgLotNo);
-                userInput.setText(edtLotNo.getText().toString());
+                final EditText userInput = (EditText) promptsView.findViewById(R.id.edtInput);
+                final EditText textView1 = (EditText) promptsView.findViewById(R.id.textView1);
+                String str="Type "+txt_title2.getText().toString()+" number: ";
+                textView1.setText(str);
+                userInput.setText(edtTitle2.getText().toString());
                 // set dialog message
                 alertDialogBuilder.setCancelable(false).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -648,6 +662,62 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     }
                 }
                 break;
+        }
+    }
+
+
+    private void textChangeDialog(String title, final TextView textView)
+    {
+        LayoutInflater li = LayoutInflater.from(MainActivity.this);
+        View promptsView = li.inflate(R.layout.prompts, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setView(promptsView);
+        final EditText userInput = (EditText) promptsView.findViewById(R.id.edtInput);
+        final EditText textView1 = (EditText) promptsView.findViewById(R.id.textView1);
+        textView1.setText(title);
+        userInput.setText(edtTitle2.getText().toString());
+        // set dialog message
+        alertDialogBuilder.setCancelable(false)
+        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            textView.setText(""+userInput.getText().toString());
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId())
+        {
+            case R.id.txt_title1:
+                textChangeDialog("Type a Title1",(TextView) v);
+                break;
+            case R.id.txt_title2:
+                textChangeDialog("Type a Title2",(TextView) v);
+                break;
+            case R.id.txt_title3:
+                textChangeDialog("Type a Title3",(TextView) v);
+                break;
+            case R.id.txt_title4:
+                textChangeDialog("Type a Title4",(TextView) v);
+                break;
+            case R.id.txt_title5:
+                textChangeDialog("Type a Title5",(TextView) v);
+                break;
+            case R.id.txt_title6:
+                textChangeDialog("Type a Title6",(TextView) v);
+                break;
+
         }
     }
 }
