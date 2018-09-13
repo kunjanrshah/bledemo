@@ -18,6 +18,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -62,11 +63,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     final static int REQUEST_LOCATION = 199;
     private static final String TAG = "MainActivity";
+    public static TextView txtSrNo = null, txt_title1 = null, txt_title2 = null, txt_title3 = null, txt_title4 = null, txt_title5 = null, txt_title6 = null, txt_title7 = null;
     private static DecimalFormat df2 = new DecimalFormat("###.###");
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
@@ -79,10 +80,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 }
             }
             if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(action)) {
-                mGoogleApiClient = new GoogleApiClient.Builder(MainActivity.this)
-                        .addApi(LocationServices.API)
-                        .addConnectionCallbacks(MainActivity.this)
-                        .addOnConnectionFailedListener(MainActivity.this).build();
+                mGoogleApiClient = new GoogleApiClient.Builder(MainActivity.this).addApi(LocationServices.API).addConnectionCallbacks(MainActivity.this).addOnConnectionFailedListener(MainActivity.this).build();
                 mGoogleApiClient.connect();
             }
         }
@@ -90,9 +88,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     PendingResult<LocationSettingsResult> result;
     BluetoothDevice bluetoothDevice;
     Button btnScan, btnTare;
+    private SharedPreferences mSharedPreference;
     private BluetoothAdapter mBluetoothAdapter;
-    private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtTitle2 = null, edtTitle3 = null;
-    public static TextView txtSrNo = null,txt_title1=null,txt_title2=null,txt_title3=null,txt_title4=null,txt_title5=null,txt_title6=null;
+    private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtTitle2 = null, edtTitle3 = null, edtMaterial = null;
     private TextClock textClock = null;
     private BluetoothLEService mBluetoothLEService;
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -114,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             btnTare.setEnabled(false);
         }
     };
+    private SharedPreferences.Editor mEditor;
     private boolean mConnected = false;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -263,8 +262,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    private void MemoryAllocation()
-    {
+    private void MemoryAllocation() {
+        mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(MainActivity.this);
+        bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        mSharedPreference = getSharedPreferences("superb", MODE_PRIVATE);
+        mEditor = mSharedPreference.edit();
         textClock = (TextClock) findViewById(R.id.textClock);
         txtSrNo = (TextView) findViewById(R.id.txtSrNo);
         txt_title1 = (TextView) findViewById(R.id.txt_title1);
@@ -273,16 +275,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         txt_title4 = (TextView) findViewById(R.id.txt_title4);
         txt_title5 = (TextView) findViewById(R.id.txt_title5);
         txt_title6 = (TextView) findViewById(R.id.txt_title6);
+        txt_title7 = (TextView) findViewById(R.id.txt_title7);
         edt_gross_wt = (EditText) findViewById(R.id.edt_gross_wt);
         edt_net_wt = (EditText) findViewById(R.id.edt_net_wt);
         edt_tare_wt = (EditText) findViewById(R.id.edt_tare_wt);
         edtTitle2 = (EditText) findViewById(R.id.edt_title2);
         edtTitle3 = (EditText) findViewById(R.id.edt_title3);
+        edtMaterial = (EditText) findViewById(R.id.edtMaterial);
         btnScan = (Button) findViewById(R.id.btnScan);
         btnTare = (Button) findViewById(R.id.btnTare);
-        mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(MainActivity.this);
-        bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         txt_title1.setOnClickListener(this);
+        txt_title2.setOnClickListener(this);
+        txt_title3.setOnClickListener(this);
+        txt_title4.setOnClickListener(this);
+        txt_title5.setOnClickListener(this);
+        txt_title6.setOnClickListener(this);
+        txt_title7.setOnClickListener(this);
     }
 
     @Override
@@ -336,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     mjsonobject.put(txt_title4.getText().toString(), edt_gross_wt.getText().toString());
                     mjsonobject.put(txt_title5.getText().toString(), edt_tare_wt.getText().toString());
                     mjsonobject.put(txt_title6.getText().toString(), edt_net_wt.getText().toString());
+                    mjsonobject.put(txt_title7.getText().toString(), edtMaterial.getText().toString());
                 } catch (Exception e) {
                     e.getMessage();
                 }
@@ -376,9 +385,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 View promptsView = li.inflate(R.layout.prompts, null);
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
                 alertDialogBuilder.setView(promptsView);
-                final EditText userInput = (EditText) promptsView.findViewById(R.id.edtInput);
-                final EditText textView1 = (EditText) promptsView.findViewById(R.id.textView1);
-                String str="Type "+txt_title2.getText().toString()+" number: ";
+                final EditText userInput = promptsView.findViewById(R.id.edtInput);
+                final TextView textView1 = promptsView.findViewById(R.id.textView1);
+                String str = "Type " + txt_title2.getText().toString() + " number: ";
                 textView1.setText(str);
                 userInput.setText(edtTitle2.getText().toString());
                 // set dialog message
@@ -411,6 +420,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
+
     private void alert() {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 //set icon
@@ -425,8 +435,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     public void onClick(DialogInterface dialogInterface, int i) {
                         setBluetooth(true);
                     }
-                })
-                .show();
+                }).show();
     }
 
     @Override
@@ -460,11 +469,59 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
         registerReceiver(mReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this).build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
         mGoogleApiClient.connect();
+
+        String stvalue = mSharedPreference.getString(Constants.txt_srvalue_sp, "1");
+        String title1 = mSharedPreference.getString(Constants.txt_title1_sp, getResources().getString(R.string.sr_no));
+        String title2 = mSharedPreference.getString(Constants.txt_title2_sp, getResources().getString(R.string.sr_no));
+        String title3 = mSharedPreference.getString(Constants.txt_title3_sp, getResources().getString(R.string.sr_no));
+        String title4 = mSharedPreference.getString(Constants.txt_title4_sp, getResources().getString(R.string.sr_no));
+        String title5 = mSharedPreference.getString(Constants.txt_title5_sp, getResources().getString(R.string.sr_no));
+        String title6 = mSharedPreference.getString(Constants.txt_title6_sp, getResources().getString(R.string.sr_no));
+        String title7 = mSharedPreference.getString(Constants.txt_title7_sp, getResources().getString(R.string.sr_no));
+        String gross_wt = mSharedPreference.getString(Constants.edt_gross_wt_sp, "0.0");
+        String tare_wt = mSharedPreference.getString(Constants.edt_tare_wt_sp, "0.0");
+        String net_wt = mSharedPreference.getString(Constants.edt_net_wt_sp, "0.0");
+        String Title2 = mSharedPreference.getString(Constants.edtTitle2_sp, getResources().getString(R.string.sr_no));
+        String Title3 = mSharedPreference.getString(Constants.edtTitle3_sp, getResources().getString(R.string.sr_no));
+        String Material = mSharedPreference.getString(Constants.edtMaterial_sp, getResources().getString(R.string.material));
+
+        txtSrNo.setText(stvalue);
+        txt_title1.setText(title1);
+        txt_title2.setText(title2);
+        txt_title3.setText(title3);
+        txt_title4.setText(title4);
+        txt_title5.setText(title5);
+        txt_title6.setText(title6);
+        txt_title7.setText(title7);
+        edt_gross_wt.setText(gross_wt);
+        edt_tare_wt.setText(tare_wt);
+        edt_net_wt.setText(net_wt);
+        edtTitle2.setText(Title2);
+        edtTitle3.setText(Title3);
+        edtMaterial.setText(Material);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mEditor.putString(Constants.txt_srvalue_sp, txtSrNo.getText().toString());
+        mEditor.putString(Constants.txt_title1_sp, txt_title1.getText().toString());
+        mEditor.putString(Constants.txt_title2_sp, txt_title2.getText().toString());
+        mEditor.putString(Constants.txt_title3_sp, txt_title3.getText().toString());
+        mEditor.putString(Constants.txt_title4_sp, txt_title4.getText().toString());
+        mEditor.putString(Constants.txt_title5_sp, txt_title5.getText().toString());
+        mEditor.putString(Constants.txt_title6_sp, txt_title6.getText().toString());
+        mEditor.putString(Constants.txt_title7_sp, txt_title7.getText().toString());
+
+        mEditor.putString(Constants.edt_gross_wt_sp, edt_gross_wt.getText().toString());
+        mEditor.putString(Constants.edt_tare_wt_sp, edt_tare_wt.getText().toString());
+        mEditor.putString(Constants.edt_net_wt_sp, edt_net_wt.getText().toString());
+        mEditor.putString(Constants.edtTitle2_sp, edtTitle2.getText().toString());
+        mEditor.putString(Constants.edtTitle3_sp, edtTitle3.getText().toString());
+        mEditor.putString(Constants.edtMaterial_sp, edtMaterial.getText().toString());
+        mEditor.apply();
     }
 
     @Override
@@ -530,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(@NonNull DialogInterface dialog, int which) {
                 //File file = new File(Environment.getExternalStorageDirectory()+ "/superb/" + filename);
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(file),"application/vnd.ms-excel");
+                intent.setDataAndType(Uri.fromFile(file), "application/vnd.ms-excel");
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -587,8 +644,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mLocationRequest.setInterval(30 * 1000);
         mLocationRequest.setFastestInterval(5 * 1000);
 
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(mLocationRequest);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest);
         builder.setAlwaysShow(true);
 
         result = LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
@@ -666,21 +722,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
-    private void textChangeDialog(String title, final TextView textView)
-    {
+    private void textChangeDialog(String title, final TextView textView) {
         LayoutInflater li = LayoutInflater.from(MainActivity.this);
         View promptsView = li.inflate(R.layout.prompts, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
         alertDialogBuilder.setView(promptsView);
-        final EditText userInput = (EditText) promptsView.findViewById(R.id.edtInput);
-        final EditText textView1 = (EditText) promptsView.findViewById(R.id.textView1);
+        final EditText userInput = promptsView.findViewById(R.id.edtInput);
+        final TextView textView1 = promptsView.findViewById(R.id.textView1);
         textView1.setText(title);
-        userInput.setText(edtTitle2.getText().toString());
+        userInput.setText(textView.getText().toString());
         // set dialog message
-        alertDialogBuilder.setCancelable(false)
-        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setCancelable(false).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-            textView.setText(""+userInput.getText().toString());
+                textView.setText("" + userInput.getText().toString());
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -697,25 +751,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onClick(View v) {
-        switch (v.getId())
-        {
+        switch (v.getId()) {
             case R.id.txt_title1:
-                textChangeDialog("Type a Title1",(TextView) v);
+                textChangeDialog("Type a Title1", (TextView) v);
                 break;
             case R.id.txt_title2:
-                textChangeDialog("Type a Title2",(TextView) v);
+                textChangeDialog("Type a Title2", (TextView) v);
                 break;
             case R.id.txt_title3:
-                textChangeDialog("Type a Title3",(TextView) v);
+                textChangeDialog("Type a Title3", (TextView) v);
                 break;
             case R.id.txt_title4:
-                textChangeDialog("Type a Title4",(TextView) v);
+                textChangeDialog("Type a Title4", (TextView) v);
                 break;
             case R.id.txt_title5:
-                textChangeDialog("Type a Title5",(TextView) v);
+                textChangeDialog("Type a Title5", (TextView) v);
                 break;
             case R.id.txt_title6:
-                textChangeDialog("Type a Title6",(TextView) v);
+                textChangeDialog("Type a Title6", (TextView) v);
+                break;
+            case R.id.txt_title7:
+                textChangeDialog("Type a Title7", (TextView) v);
                 break;
 
         }

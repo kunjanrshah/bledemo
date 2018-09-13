@@ -33,7 +33,7 @@
                 android:id="@+id/txt_title1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sr. No"
+                android:text="@string/sr_no"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -59,7 +59,7 @@
                 android:id="@+id/txt_title2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lot No"
+                android:text="@string/lot_no"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -83,9 +83,10 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/txt_title3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bale No"
+                android:text="@string/bale_no"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -119,10 +120,10 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/txt_title3"
+                android:id="@+id/txt_title4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Gross Wt"
+                android:text="@string/gross_wt"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -133,37 +134,11 @@
                 android:focusableInTouchMode="false"
                 android:gravity="center"
                 android:inputType="numberDecimal"
-                android:text="0.00"
+                android:text="@string/_0_00"
                 android:textSize="18sp" />
 
         </LinearLayout>
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/txt_title4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tare Wt"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/edt_tare_wt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:inputType="numberDecimal"
-                android:text="0.00"
-                android:textSize="18sp" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -176,7 +151,33 @@
                 android:id="@+id/txt_title5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Net Wt"
+                android:text="@string/tare_wt"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_tare_wt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:text="@string/_0_00"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_title6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/net_wt"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -187,7 +188,7 @@
                 android:focusableInTouchMode="false"
                 android:gravity="center"
                 android:inputType="numberDecimal"
-                android:text="0.00"
+                android:text="@string/_0_00"
                 android:textSize="18sp"
                 tools:ignore="LabelFor" />
 
@@ -226,19 +227,17 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/txt_title6"
+                    android:id="@+id/txt_title7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Material"
+                    android:text="@string/material"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <EditText
-                    android:id="@+id/edt_material"
+                    android:id="@+id/edtMaterial"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
-                    android:focusableInTouchMode="false"
-                    android:gravity="center"
                     android:inputType="text"
                     android:textSize="18sp"
                     tools:ignore="LabelFor" />

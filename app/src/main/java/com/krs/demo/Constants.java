@@ -32,6 +32,21 @@ public class Constants {
 
     public static int SCAN_PERIOD = 10000;
 
+    public static String txt_srvalue_sp="txt_srvalue";
+    public static String txt_title1_sp="txt_title1";
+    public static String txt_title2_sp="txt_title2";
+    public static String txt_title3_sp="txt_title3";
+    public static String txt_title4_sp="txt_title4";
+    public static String txt_title5_sp="txt_title5";
+    public static String txt_title6_sp="txt_title6";
+    public static String txt_title7_sp="txt_title7";
+    public static String edt_gross_wt_sp="edt_gross_wt";
+    public static String edt_tare_wt_sp="edt_tare_wt_wt";
+    public static String edt_net_wt_sp="edt_net_wt_wt";
+    public static String edtTitle2_sp="edtTitle2_wt";
+    public static String edtTitle3_sp="edtTitle3_wt";
+    public static String edtMaterial_sp="edtMaterial_wt";
+
     public static File getFile(String fileName) {
         //Saving file in external storage
         File sdCard = Environment.getExternalStorageDirectory();
@@ -72,7 +87,8 @@ public class Constants {
                 sheet.addCell(new Label(3, 0, MainActivity.txt_title6.getText().toString()));
                 sheet.addCell(new Label(4, 0, MainActivity.txt_title2.getText().toString()));
                 sheet.addCell(new Label(5, 0, MainActivity.txt_title3.getText().toString()));
-                sheet.addCell(new Label(6, 0, "Date"));
+                sheet.addCell(new Label(6, 0, MainActivity.txt_title7.getText().toString()));
+                sheet.addCell(new Label(7, 0, "Date"));
                 if (mjson != null) {
                     try {
                         String srno = mjson.getString(MainActivity.txt_title1.getText().toString());
@@ -81,6 +97,7 @@ public class Constants {
                         String gross_wt = mjson.getString(MainActivity.txt_title4.getText().toString());
                         String tare_wt = mjson.getString(MainActivity.txt_title5.getText().toString());
                         String net_wt = mjson.getString(MainActivity.txt_title6.getText().toString());
+                        String material = mjson.getString(MainActivity.txt_title7.getText().toString());
                         String date = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a EEE", Locale.getDefault()).format(new Date());
 
                         sheet.addCell(new Label(0, Integer.parseInt(srno), srno));
@@ -89,7 +106,8 @@ public class Constants {
                         sheet.addCell(new Label(3, Integer.parseInt(srno), net_wt));
                         sheet.addCell(new Label(4, Integer.parseInt(srno), lot_no));
                         sheet.addCell(new Label(5, Integer.parseInt(srno), bale_no));
-                        sheet.addCell(new Label(6, Integer.parseInt(srno), date));
+                        sheet.addCell(new Label(6, Integer.parseInt(srno), material));
+                        sheet.addCell(new Label(7, Integer.parseInt(srno), date));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
