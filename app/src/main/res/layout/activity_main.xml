@@ -64,7 +64,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/edt_title2"
+                android:id="@+id/edt_lotno"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -91,7 +91,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/edt_title3"
+                android:id="@+id/edt_baleno"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -203,6 +203,30 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/txt_title7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/material"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtMaterial"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:textSize="18sp"
+            tools:ignore="LabelFor" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -214,35 +238,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:text="@string/scan"
                 tools:ignore="ButtonStyle" />
 
-            <LinearLayout
+            <Button
+                android:id="@+id/btnSubmit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/txt_title7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/material"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/edtMaterial"
-                    android:layout_width="200dp"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:textSize="18sp"
-                    tools:ignore="LabelFor" />
-
-            </LinearLayout>
+                android:layout_marginStart="10dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/submit"
+                tools:ignore="ButtonStyle" />
 
         </LinearLayout>
 
@@ -264,15 +273,6 @@
                 android:text="@string/next"
                 tools:ignore="ButtonStyle" />
 
-            <Button
-                android:id="@+id/btnSubmit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:text="@string/submit"
-                tools:ignore="ButtonStyle" />
 
             <Button
                 android:id="@+id/btnTare"

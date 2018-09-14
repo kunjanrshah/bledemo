@@ -43,8 +43,8 @@ public class Constants {
     public static String edt_gross_wt_sp="edt_gross_wt";
     public static String edt_tare_wt_sp="edt_tare_wt_wt";
     public static String edt_net_wt_sp="edt_net_wt_wt";
-    public static String edtTitle2_sp="edtTitle2_wt";
-    public static String edtTitle3_sp="edtTitle3_wt";
+    public static String edtLotno_sp ="edtTitle2_wt";
+    public static String edtBaleno_sp ="edtTitle3_wt";
     public static String edtMaterial_sp="edtMaterial_wt";
 
     public static File getFile(String fileName) {
