@@ -88,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     PendingResult<LocationSettingsResult> result;
     BluetoothDevice bluetoothDevice;
     Button btnScan, btnTare;
+    private Button btncount;
+    private int count = 0, isShow = 0;
     private SharedPreferences mSharedPreference;
     private BluetoothAdapter mBluetoothAdapter;
     private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtTitle2 = null, edtTitle3 = null, edtMaterial = null;
@@ -211,18 +213,65 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 String output = "";
                 for (int i = 0; i < data.length; i++) {
                     output = output + Character.toString((char) data[i]);
-                    edt_gross_wt.setText(output);
-                    Double net = 0.0d;
-                    if (!edt_tare_wt.getText().toString().isEmpty()) {
-                        net = Double.parseDouble(output) - Double.parseDouble(edt_tare_wt.getText().toString());
-                    }
-                    edt_net_wt.setText("" + df2.format(net));
                 }
+                if (count == 0) {
+                    edt_gross_wt.setText(output);
+                } else if (count == 1) {
+                    dotAtLastEnd();
+                } else if (count == 2) {
+                    dotAtBeforeLastEnd();
+                }
+                Double net = 0.0d;
+                if (!edt_tare_wt.getText().toString().isEmpty()) {
+                    net = Double.parseDouble(output) - Double.parseDouble(edt_tare_wt.getText().toString());
+                }
+                edt_net_wt.setText("" + df2.format(net));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    private void dotAtLastEnd() {
+        try {
+            String output = edt_gross_wt.getText().toString();
+            output = output.replaceAll(".", "");
+            int len = output.length();
+            if (len > 4) {
+                output = output.substring(0, 4) + "." + output.substring(4, output.length());
+                if (output.substring(0, 3).equalsIgnoreCase("000")) {
+                    output = output.substring(3);
+                } else if (output.substring(0, 2).equalsIgnoreCase("00")) {
+                    output = output.substring(2);
+                } else if (output.substring(0, 1).equalsIgnoreCase("0")) {
+                    output = output.substring(1);
+                }
+                edt_gross_wt.setText(output);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void dotAtBeforeLastEnd() {
+        try {
+            String output = edt_gross_wt.getText().toString();
+            output = output.replaceAll(".", "");
+            int len = output.length();
+            if (len > 4) {
+                output = output.substring(0, 3) + "." + output.substring(3, output.length());
+                if (output.substring(0, 2).equalsIgnoreCase("00")) {
+                    output = output.substring(2);
+                } else if (output.substring(0, 1).equalsIgnoreCase("0")) {
+                    output = output.substring(1);
+                }
+                edt_gross_wt.setText(output);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null) return;
@@ -267,6 +316,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         mSharedPreference = getSharedPreferences("superb", MODE_PRIVATE);
         mEditor = mSharedPreference.edit();
+        count = mSharedPreference.getInt("count", 0);
         textClock = (TextClock) findViewById(R.id.textClock);
         txtSrNo = (TextView) findViewById(R.id.txtSrNo);
         txt_title1 = (TextView) findViewById(R.id.txt_title1);
@@ -284,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         edtMaterial = (EditText) findViewById(R.id.edtMaterial);
         btnScan = (Button) findViewById(R.id.btnScan);
         btnTare = (Button) findViewById(R.id.btnTare);
+        btncount = (Button) findViewById(R.id.btncount);
         txt_title1.setOnClickListener(this);
         txt_title2.setOnClickListener(this);
         txt_title3.setOnClickListener(this);
@@ -408,6 +459,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 // show it
                 alertDialog.show();
+            }
+        });
+
+        btncount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (count == 0) {
+                    count = 1;
+                } else if (count == 1) {
+                    count = 2;
+                } else if (count == 2) {
+                    count = 0;
+                }
+                Toast.makeText(MainActivity.this, "count: " + count, Toast.LENGTH_SHORT).show();
+                mEditor.putInt("", count);
+                mEditor.apply();
+            }
+        });
+
+        textClock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isShow++;
+                if (isShow > 10) {
+                    btncount.setVisibility(View.VISIBLE);
+                } else {
+                    btncount.setVisibility(View.GONE);
+                }
             }
         });
 
