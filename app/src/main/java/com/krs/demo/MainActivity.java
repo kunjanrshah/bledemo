@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     count = 0;
                 }
                 Toast.makeText(MainActivity.this, "count: " + count, Toast.LENGTH_SHORT).show();
-                mEditor.putInt("", count);
+                mEditor.putInt("count", count);
                 mEditor.apply();
             }
         });
