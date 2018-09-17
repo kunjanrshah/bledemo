@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private int count = 0, isShow = 0;
     private SharedPreferences mSharedPreference;
     private BluetoothAdapter mBluetoothAdapter;
-    private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtTitle2 = null, edtTitle3 = null, edtMaterial = null;
+    private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtLotno = null, edtBaleno = null, edtMaterial = null;
     private TextClock textClock = null;
     private BluetoothLEService mBluetoothLEService;
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -329,8 +329,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         edt_gross_wt = (EditText) findViewById(R.id.edt_gross_wt);
         edt_net_wt = (EditText) findViewById(R.id.edt_net_wt);
         edt_tare_wt = (EditText) findViewById(R.id.edt_tare_wt);
-        edtTitle2 = (EditText) findViewById(R.id.edt_title2);
-        edtTitle3 = (EditText) findViewById(R.id.edt_title3);
+        edtLotno = (EditText) findViewById(R.id.edt_lotno);
+        edtBaleno = (EditText) findViewById(R.id.edt_baleno);
         edtMaterial = (EditText) findViewById(R.id.edtMaterial);
         btnScan = (Button) findViewById(R.id.btnScan);
         btnTare = (Button) findViewById(R.id.btnTare);
@@ -353,24 +353,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    if (btnScan.getText().toString().equalsIgnoreCase("connected")) {
-                        mBluetoothLEService.disconnect();
-                        mBluetoothLEService.close();
-                       /* mBluetoothLEService.close();
-                        mBluetoothLEService=null;*/
-                        btnScan.setText("disconnected");
-                        Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (mBluetoothLEService != null) {
-                            mBluetoothLEService.connect("C8:FD:19:4B:1F:09");
-                        } else {
-                            startScanning(true);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                alert("Are you sure for Scan?", "scan");
             }
         });
         btnTare.setOnClickListener(new View.OnClickListener() {
@@ -390,8 +373,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 JSONObject mjsonobject = new JSONObject();
                 try {
                     mjsonobject.put(txt_title1.getText().toString(), txtSrNo.getText().toString());
-                    mjsonobject.put(txt_title2.getText().toString(), edtTitle2.getText().toString());
-                    mjsonobject.put(txt_title3.getText().toString(), edtTitle3.getText().toString());
+                    mjsonobject.put(txt_title2.getText().toString(), edtLotno.getText().toString());
+                    mjsonobject.put(txt_title3.getText().toString(), edtBaleno.getText().toString());
                     mjsonobject.put(txt_title4.getText().toString(), edt_gross_wt.getText().toString());
                     mjsonobject.put(txt_title5.getText().toString(), edt_tare_wt.getText().toString());
                     mjsonobject.put(txt_title6.getText().toString(), edt_net_wt.getText().toString());
@@ -399,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } catch (Exception e) {
                     e.getMessage();
                 }
-                String filename = "superb_" + edtTitle2.getText().toString().trim() + "_lot.xls";
+                String filename = "superb_" + edtLotno.getText().toString().trim() + "_lot.xls";
                 if (txtSrNo.getText().toString().equalsIgnoreCase("1")) {
                     Constants.exportToExcel(mjsonobject, filename, true);
                 } else {
@@ -407,8 +390,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 }
                 int no = Integer.parseInt(txtSrNo.getText().toString()) + 1;
                 txtSrNo.setText("" + no);
-                int bale_no = Integer.parseInt(edtTitle3.getText().toString()) + 1;
-                edtTitle3.setText("" + bale_no);
+                int bale_no = Integer.parseInt(edtBaleno.getText().toString()) + 1;
+                edtBaleno.setText("" + bale_no);
                 Toast.makeText(MainActivity.this, "Written in " + filename, Toast.LENGTH_SHORT).show();
             }
         });
@@ -416,15 +399,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         findViewById(R.id.btnSubmit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                txtSrNo.setText("1");
-                edtTitle3.setText("1");
-                if (!edtTitle2.getText().toString().isEmpty()) {
-                    int lot = Integer.parseInt(edtTitle2.getText().toString()) + 1;
-                    edtTitle2.setText("" + lot);
-                } else {
-                    edtTitle2.setText("1");
-                }
-                Log.d(TAG, "step btnSubmit");
+                alert("Are you sure to Submit ?", "submit");
+
             }
         });
 
@@ -440,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 final TextView textView1 = promptsView.findViewById(R.id.textView1);
                 String str = "Type " + txt_title2.getText().toString() + " number: ";
                 textView1.setText(str);
-                userInput.setText(edtTitle2.getText().toString());
+                userInput.setText(edtLotno.getText().toString());
                 // set dialog message
                 alertDialogBuilder.setCancelable(false).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -499,6 +475,58 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
+    private void alert(String message, final String state) {
+        AlertDialog alertDialog = null;
+        alertDialog = new AlertDialog.Builder(this)
+                //set icon
+                .setIcon(R.drawable.app_icon)
+                //set title
+                .setTitle(getResources().getString(R.string.app_name))
+                //set message
+                .setMessage(message)
+                //set positive button
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (state.equalsIgnoreCase("submit")) {
+                            txtSrNo.setText("1");
+                            edtBaleno.setText("1");
+                            if (!edtLotno.getText().toString().isEmpty()) {
+                                int lot = Integer.parseInt(edtLotno.getText().toString()) + 1;
+                                edtLotno.setText("" + lot);
+                            } else {
+                                edtLotno.setText("1");
+                            }
+                            Log.d(TAG, "step btnSubmit");
+                        } else if (state.equalsIgnoreCase("scan")) {
+                            try {
+                                if (btnScan.getText().toString().equalsIgnoreCase("connected")) {
+                                    mBluetoothLEService.disconnect();
+                                    mBluetoothLEService.close();
+                                    btnScan.setText("disconnected");
+                                    Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    if (mBluetoothLEService != null) {
+                                        mBluetoothLEService.connect("C8:FD:19:4B:1F:09");
+                                    } else {
+                                        startScanning(true);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .show();
+    }
 
     private void alert() {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
@@ -553,18 +581,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         String stvalue = mSharedPreference.getString(Constants.txt_srvalue_sp, "1");
         String title1 = mSharedPreference.getString(Constants.txt_title1_sp, getResources().getString(R.string.sr_no));
-        String title2 = mSharedPreference.getString(Constants.txt_title2_sp, getResources().getString(R.string.sr_no));
-        String title3 = mSharedPreference.getString(Constants.txt_title3_sp, getResources().getString(R.string.sr_no));
-        String title4 = mSharedPreference.getString(Constants.txt_title4_sp, getResources().getString(R.string.sr_no));
-        String title5 = mSharedPreference.getString(Constants.txt_title5_sp, getResources().getString(R.string.sr_no));
-        String title6 = mSharedPreference.getString(Constants.txt_title6_sp, getResources().getString(R.string.sr_no));
-        String title7 = mSharedPreference.getString(Constants.txt_title7_sp, getResources().getString(R.string.sr_no));
+        String title2 = mSharedPreference.getString(Constants.txt_title2_sp, getResources().getString(R.string.lot_no));
+        String title3 = mSharedPreference.getString(Constants.txt_title3_sp, getResources().getString(R.string.bale_no));
+        String title4 = mSharedPreference.getString(Constants.txt_title4_sp, getResources().getString(R.string.gross_wt));
+        String title5 = mSharedPreference.getString(Constants.txt_title5_sp, getResources().getString(R.string.tare_wt));
+        String title6 = mSharedPreference.getString(Constants.txt_title6_sp, getResources().getString(R.string.net_wt));
+        String title7 = mSharedPreference.getString(Constants.txt_title7_sp, getResources().getString(R.string.material));
         String gross_wt = mSharedPreference.getString(Constants.edt_gross_wt_sp, "0.0");
         String tare_wt = mSharedPreference.getString(Constants.edt_tare_wt_sp, "0.0");
         String net_wt = mSharedPreference.getString(Constants.edt_net_wt_sp, "0.0");
-        String Title2 = mSharedPreference.getString(Constants.edtTitle2_sp, getResources().getString(R.string.sr_no));
-        String Title3 = mSharedPreference.getString(Constants.edtTitle3_sp, getResources().getString(R.string.sr_no));
-        String Material = mSharedPreference.getString(Constants.edtMaterial_sp, getResources().getString(R.string.material));
+        String lot_no = mSharedPreference.getString(Constants.edtLotno_sp, "1");
+        String bale_no = mSharedPreference.getString(Constants.edtBaleno_sp, "1");
+        String Material = mSharedPreference.getString(Constants.edtMaterial_sp, "");
 
         txtSrNo.setText(stvalue);
         txt_title1.setText(title1);
@@ -577,14 +605,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         edt_gross_wt.setText(gross_wt);
         edt_tare_wt.setText(tare_wt);
         edt_net_wt.setText(net_wt);
-        edtTitle2.setText(Title2);
-        edtTitle3.setText(Title3);
+        edtLotno.setText(lot_no);
+        edtBaleno.setText(bale_no);
         edtMaterial.setText(Material);
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
+
         mEditor.putString(Constants.txt_srvalue_sp, txtSrNo.getText().toString());
         mEditor.putString(Constants.txt_title1_sp, txt_title1.getText().toString());
         mEditor.putString(Constants.txt_title2_sp, txt_title2.getText().toString());
@@ -597,8 +626,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mEditor.putString(Constants.edt_gross_wt_sp, edt_gross_wt.getText().toString());
         mEditor.putString(Constants.edt_tare_wt_sp, edt_tare_wt.getText().toString());
         mEditor.putString(Constants.edt_net_wt_sp, edt_net_wt.getText().toString());
-        mEditor.putString(Constants.edtTitle2_sp, edtTitle2.getText().toString());
-        mEditor.putString(Constants.edtTitle3_sp, edtTitle3.getText().toString());
+        mEditor.putString(Constants.edtLotno_sp, edtLotno.getText().toString());
+        mEditor.putString(Constants.edtBaleno_sp, edtBaleno.getText().toString());
         mEditor.putString(Constants.edtMaterial_sp, edtMaterial.getText().toString());
         mEditor.apply();
     }
