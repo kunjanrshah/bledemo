@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     final static int REQUEST_LOCATION = 199;
     private static final String TAG = "MainActivity";
     public static TextView txtSrNo = null, txt_title1 = null, txt_title2 = null, txt_title3 = null, txt_title4 = null, txt_title5 = null, txt_title6 = null, txt_title7 = null;
-    private static DecimalFormat df2 = new DecimalFormat("###.###");
+    private static DecimalFormat df2 = new DecimalFormat(".##");
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     public final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -217,13 +217,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (count == 0) {
                     edt_gross_wt.setText(output);
                 } else if (count == 1) {
-                    dotAtLastEnd();
+                    dotAtLastEnd(output);
                 } else if (count == 2) {
-                    dotAtBeforeLastEnd();
+                    dotAtBeforeLastEnd(output);
+                } else if (count == 3) {
+                    dotAtEnd_3(output);
                 }
                 Double net = 0.0d;
-                if (!edt_tare_wt.getText().toString().isEmpty()) {
-                    net = Double.parseDouble(output) - Double.parseDouble(edt_tare_wt.getText().toString());
+                if (!edt_tare_wt.getText().toString().isEmpty() && !edt_gross_wt.getText().toString().isEmpty()) {
+                    net = Double.parseDouble(edt_gross_wt.getText().toString()) - Double.parseDouble(edt_tare_wt.getText().toString());
                 }
                 edt_net_wt.setText("" + df2.format(net));
             }
@@ -232,13 +234,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    private void dotAtLastEnd() {
+    private void dotAtLastEnd(String output) {
         try {
-            String output = edt_gross_wt.getText().toString();
-            output = output.replaceAll(".", "");
+            output = output.replace(".", "");
+            output = output.replace("\n\r", "");
+            boolean flag = false;
+            if (output.contains("-")) {
+                flag = true;
+                output = output.replace("-", "");
+            }
+            output = output.trim();
             int len = output.length();
             if (len > 4) {
-                output = output.substring(0, 4) + "." + output.substring(4, output.length());
+                if (len == 5) {
+                    output = output.substring(0, 4) + "." + output.substring(4, output.length());
+                } else if (len == 6) {
+                    output = output.substring(0, 5) + "." + output.substring(5, output.length());
+                }
+
                 if (output.substring(0, 3).equalsIgnoreCase("000")) {
                     output = output.substring(3);
                 } else if (output.substring(0, 2).equalsIgnoreCase("00")) {
@@ -246,24 +259,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } else if (output.substring(0, 1).equalsIgnoreCase("0")) {
                     output = output.substring(1);
                 }
-                edt_gross_wt.setText(output);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void dotAtBeforeLastEnd() {
-        try {
-            String output = edt_gross_wt.getText().toString();
-            output = output.replaceAll(".", "");
-            int len = output.length();
-            if (len > 4) {
-                output = output.substring(0, 3) + "." + output.substring(3, output.length());
-                if (output.substring(0, 2).equalsIgnoreCase("00")) {
-                    output = output.substring(2);
-                } else if (output.substring(0, 1).equalsIgnoreCase("0")) {
-                    output = output.substring(1);
+                if (flag) {
+                    output = "-".concat(output);
                 }
                 edt_gross_wt.setText(output);
             }
@@ -272,6 +269,71 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
+    private void dotAtBeforeLastEnd(String output1) {
+        try {
+            output1 = output1.replace(".", "");
+            boolean flag = false;
+            if (output1.contains("-")) {
+                flag = true;
+                output1 = output1.replace("-", "");
+            }
+            output1 = output1.replace("\n\r", "");
+            output1 = output1.trim();
+            int len = output1.length();
+            if (len > 4) {
+                if (len == 5) {
+                    output1 = output1.substring(0, 3) + "." + output1.substring(3, output1.length());
+                } else if (len == 6) {
+                    output1 = output1.substring(0, 4) + "." + output1.substring(4, output1.length());
+                }
+
+                if (output1.substring(0, 2).equalsIgnoreCase("00")) {
+                    output1 = output1.substring(2);
+                } else if (output1.substring(0, 1).equalsIgnoreCase("0")) {
+                    output1 = output1.substring(1);
+                }
+                if (flag) {
+                    output1 = "-".concat(output1);
+                }
+                edt_gross_wt.setText("" + output1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void dotAtEnd_3(String output1) {
+        try {
+            output1 = output1.replace(".", "");
+            boolean flag = false;
+            if (output1.contains("-")) {
+                flag = true;
+                output1 = output1.replace("-", "");
+            }
+            output1 = output1.replace("\n\r", "");
+            output1 = output1.trim();
+            int len = output1.length();
+            if (len > 4) {
+                if (len == 5) {
+                    output1 = output1.substring(0, 2) + "." + output1.substring(2, output1.length());
+                } else if (len == 6) {
+                    output1 = output1.substring(0, 3) + "." + output1.substring(3, output1.length());
+                }
+
+                if (output1.substring(0, 2).equalsIgnoreCase("00")) {
+                    output1 = output1.substring(2);
+                } else if (output1.substring(0, 1).equalsIgnoreCase("0")) {
+                    output1 = output1.substring(1);
+                }
+                if (flag) {
+                    output1 = "-".concat(output1);
+                }
+                edt_gross_wt.setText("" + output1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null) return;
@@ -446,9 +508,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } else if (count == 1) {
                     count = 2;
                 } else if (count == 2) {
+                    count = 3;
+                } else if (count == 3) {
                     count = 0;
                 }
-                Toast.makeText(MainActivity.this, "count: " + count, Toast.LENGTH_SHORT).show();
+                btncount.setText("Count " + count);
                 mEditor.putInt("count", count);
                 mEditor.apply();
             }
@@ -458,7 +522,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onClick(View v) {
                 isShow++;
-                if (isShow > 10) {
+                if (isShow > 4) {
+                    btncount.setText("Count " + count);
                     btncount.setVisibility(View.VISIBLE);
                 } else {
                     btncount.setVisibility(View.GONE);
@@ -504,6 +569,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                                     mBluetoothLEService.disconnect();
                                     mBluetoothLEService.close();
                                     btnScan.setText("disconnected");
+                                    edt_gross_wt.setText("0.0");
+                                    edt_tare_wt.setText("0.0");
+                                    edt_net_wt.setText("0.0");
                                     Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_SHORT).show();
                                 } else {
                                     if (mBluetoothLEService != null) {
@@ -587,9 +655,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         String title5 = mSharedPreference.getString(Constants.txt_title5_sp, getResources().getString(R.string.tare_wt));
         String title6 = mSharedPreference.getString(Constants.txt_title6_sp, getResources().getString(R.string.net_wt));
         String title7 = mSharedPreference.getString(Constants.txt_title7_sp, getResources().getString(R.string.material));
-        String gross_wt = mSharedPreference.getString(Constants.edt_gross_wt_sp, "0.0");
-        String tare_wt = mSharedPreference.getString(Constants.edt_tare_wt_sp, "0.0");
-        String net_wt = mSharedPreference.getString(Constants.edt_net_wt_sp, "0.0");
+        //String gross_wt = mSharedPreference.getString(Constants.edt_gross_wt_sp, "0.0");
+        //String tare_wt = mSharedPreference.getString(Constants.edt_tare_wt_sp, "0.0");
+        //String net_wt = mSharedPreference.getString(Constants.edt_net_wt_sp, "0.0");
         String lot_no = mSharedPreference.getString(Constants.edtLotno_sp, "1");
         String bale_no = mSharedPreference.getString(Constants.edtBaleno_sp, "1");
         String Material = mSharedPreference.getString(Constants.edtMaterial_sp, "");
@@ -602,9 +670,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         txt_title5.setText(title5);
         txt_title6.setText(title6);
         txt_title7.setText(title7);
-        edt_gross_wt.setText(gross_wt);
-        edt_tare_wt.setText(tare_wt);
-        edt_net_wt.setText(net_wt);
+        edt_gross_wt.setText("0.0");
+        edt_tare_wt.setText("0.0");
+        edt_net_wt.setText("0.0");
         edtLotno.setText(lot_no);
         edtBaleno.setText(bale_no);
         edtMaterial.setText(Material);
