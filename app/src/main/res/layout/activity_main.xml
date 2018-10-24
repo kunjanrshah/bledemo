@@ -3,36 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/darker_gray"
     android:orientation="vertical">
-
-    <TextClock
-        android:id="@+id/textClock"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:gravity="right"
-        android:text="date"
-        android:textSize="16sp" />
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:baselineAligned="false"
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/txt_title1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="@string/sr_no"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -47,61 +37,45 @@
 
         </LinearLayout>
 
-
-        <LinearLayout
+        <TextClock
+            android:id="@+id/textClock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_margin="10dp"
+            android:gravity="right"
+            android:text="date"
+            android:textSize="16sp" />
+    </LinearLayout>
 
-            <TextView
-                android:id="@+id/txt_title2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lot_no"
-                android:textSize="18sp"
-                android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/edt_lotno"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:inputType="number"
-                android:text="1"
-                android:textSize="18sp"
-                tools:ignore="LabelFor" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-        </LinearLayout>
+        <TextView
+            android:id="@+id/txt_title4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="@string/gross_wt"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/edt_gross_wt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:background="@android:color/black"
+            android:focusableInTouchMode="false"
             android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/txt_title3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/bale_no"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/edt_baleno"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:inputType="number"
-                android:text="1"
-                android:textSize="18sp"
-                tools:ignore="LabelFor" />
-
-        </LinearLayout>
-
+            android:inputType="numberDecimal"
+            android:text="@string/_0_00"
+            android:textColor="@color/colorAccent"
+            android:textSize="70sp" />
 
     </LinearLayout>
 
@@ -110,40 +84,13 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:baselineAligned="false"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/txt_title4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/gross_wt"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/edt_gross_wt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusableInTouchMode="false"
-                android:gravity="center"
-                android:inputType="numberDecimal"
-                android:text="@string/_0_00"
-                android:textSize="18sp" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -189,6 +136,106 @@
                 android:gravity="center"
                 android:inputType="numberDecimal"
                 android:text="@string/_0_00"
+                android:textSize="38sp"
+                tools:ignore="LabelFor" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_title2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/lot_no"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_lotno"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="1"
+                android:textSize="18sp"
+                tools:ignore="LabelFor" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_title7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/material"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtMaterial"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="18sp"
+                tools:ignore="LabelFor" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_title3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/bale_no"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edt_baleno"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="1"
                 android:textSize="18sp"
                 tools:ignore="LabelFor" />
 
@@ -197,29 +244,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/txt_title7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/material"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/edtMaterial"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:textSize="18sp"
-            tools:ignore="LabelFor" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -230,7 +254,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <Button
@@ -238,19 +262,156 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginStart="10dp"
+                android:background="@color/colorPrimary"
                 android:clickable="true"
                 android:focusable="true"
                 android:text="@string/scan"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnNext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/next"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
                 tools:ignore="ButtonStyle" />
 
             <Button
                 android:id="@+id/btnSubmit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
                 android:clickable="true"
                 android:focusable="true"
                 android:text="@string/submit"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnExport1"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/export"
+                android:textColor="@android:color/white"
+                tools:ignore="ButtonStyle" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnTare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:text="@string/tare"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
+                android:text="@string/mode"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnInc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
+                android:text="M+/INC"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnShift"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
+                android:text="MR/Shift"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                tools:ignore="ButtonStyle" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnR1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:text="R1"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnR2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
+                android:text="R2"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnR3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
+                android:text="R3"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnR4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
+                android:text="R4"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
                 tools:ignore="ButtonStyle" />
 
         </LinearLayout>
@@ -264,45 +425,49 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnNext"
+                android:id="@+id/btnF1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:text="@string/next"
-                tools:ignore="ButtonStyle" />
-
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:text="F1" />
 
             <Button
-                android:id="@+id/btnTare"
+                android:id="@+id/btnF2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:enabled="false"
-                android:text="@string/tare"
-                android:visibility="gone"
-                tools:ignore="ButtonStyle" />
+                android:layout_gravity="center"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_marginStart="5dp"
+                android:text="F2" />
 
             <Button
-                android:id="@+id/btnExport1"
+                android:id="@+id/btnF3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:text="@string/export"
-                tools:ignore="ButtonStyle" />
+                android:layout_gravity="center"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_marginStart="5dp"
+                android:text="F3" />
+
+            <Button
+                android:id="@+id/btncount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:text="count" />
+
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btncount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:text="count"
-            android:visibility="gone" />
 
     </LinearLayout>
 </LinearLayout>

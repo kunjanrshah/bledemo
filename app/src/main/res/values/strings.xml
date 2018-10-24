@@ -3,12 +3,13 @@
     <string name="next">Next</string>
     <string name="submit">Submit</string>
     <string name="tare">TARE</string>
+    <string name="mode">MODE</string>
     <string name="export">Export</string>
     <string name="scan">Scan</string>
     <string name="sr_no">Sr. No</string>
     <string name="lot_no">Lot No</string>
     <string name="bale_no">Bale No</string>
-    <string name="gross_wt">Gross Wt</string>
+    <string name="gross_wt">Gross Weight</string>
     <string name="tare_wt">Tare Wt</string>
     <string name="_0_00">0.00</string>
     <string name="net_wt">Net Wt</string>

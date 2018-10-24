@@ -92,7 +92,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private int count = 0, isShow = 0;
     private SharedPreferences mSharedPreference;
     private BluetoothAdapter mBluetoothAdapter;
-    private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtLotno = null, edtBaleno = null, edtMaterial = null;
+    private EditText  edt_net_wt = null, edtLotno = null, edtBaleno = null, edtMaterial = null, edt_tare_wt = null;
+    private TextView txt_gross_wt = null;
     private TextClock textClock = null;
     private BluetoothLEService mBluetoothLEService;
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -215,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     output = output + Character.toString((char) data[i]);
                 }
                 if (count == 0) {
-                    edt_gross_wt.setText(output);
+                    txt_gross_wt.setText(output);
                 } else if (count == 1) {
                     dotAtLastEnd(output);
                 } else if (count == 2) {
@@ -224,8 +225,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     dotAtEnd_3(output);
                 }
                 Double net = 0.0d;
-                if (!edt_tare_wt.getText().toString().isEmpty() && !edt_gross_wt.getText().toString().isEmpty()) {
-                    net = Double.parseDouble(edt_gross_wt.getText().toString()) - Double.parseDouble(edt_tare_wt.getText().toString());
+                if (!edt_tare_wt.getText().toString().isEmpty() && !txt_gross_wt.getText().toString().isEmpty()) {
+                    net = Double.parseDouble(txt_gross_wt.getText().toString()) - Double.parseDouble(edt_tare_wt.getText().toString());
                 }
                 edt_net_wt.setText("" + df2.format(net));
             }
@@ -262,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (flag) {
                     output = "-".concat(output);
                 }
-                edt_gross_wt.setText(output);
+                txt_gross_wt.setText(output);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -295,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (flag) {
                     output1 = "-".concat(output1);
                 }
-                edt_gross_wt.setText("" + output1);
+                txt_gross_wt.setText("" + output1);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -328,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (flag) {
                     output1 = "-".concat(output1);
                 }
-                edt_gross_wt.setText("" + output1);
+                txt_gross_wt.setText("" + output1);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -388,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         txt_title5 = (TextView) findViewById(R.id.txt_title5);
         txt_title6 = (TextView) findViewById(R.id.txt_title6);
         txt_title7 = (TextView) findViewById(R.id.txt_title7);
-        edt_gross_wt = (EditText) findViewById(R.id.edt_gross_wt);
+        txt_gross_wt = (TextView) findViewById(R.id.edt_gross_wt);
         edt_net_wt = (EditText) findViewById(R.id.edt_net_wt);
         edt_tare_wt = (EditText) findViewById(R.id.edt_tare_wt);
         edtLotno = (EditText) findViewById(R.id.edt_lotno);
@@ -426,7 +427,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } else {
                     Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
         findViewById(R.id.btnNext).setOnClickListener(new View.OnClickListener() {
@@ -437,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     mjsonobject.put(txt_title1.getText().toString(), txtSrNo.getText().toString());
                     mjsonobject.put(txt_title2.getText().toString(), edtLotno.getText().toString());
                     mjsonobject.put(txt_title3.getText().toString(), edtBaleno.getText().toString());
-                    mjsonobject.put(txt_title4.getText().toString(), edt_gross_wt.getText().toString());
+                    mjsonobject.put(txt_title4.getText().toString(), txt_gross_wt.getText().toString());
                     mjsonobject.put(txt_title5.getText().toString(), edt_tare_wt.getText().toString());
                     mjsonobject.put(txt_title6.getText().toString(), edt_net_wt.getText().toString());
                     mjsonobject.put(txt_title7.getText().toString(), edtMaterial.getText().toString());
@@ -569,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                                     mBluetoothLEService.disconnect();
                                     mBluetoothLEService.close();
                                     btnScan.setText("disconnected");
-                                    edt_gross_wt.setText("0.0");
+                                    txt_gross_wt.setText("0.0");
                                     edt_tare_wt.setText("0.0");
                                     edt_net_wt.setText("0.0");
                                     Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_SHORT).show();
@@ -670,7 +670,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         txt_title5.setText(title5);
         txt_title6.setText(title6);
         txt_title7.setText(title7);
-        edt_gross_wt.setText("0.0");
+        txt_gross_wt.setText("0.0");
         edt_tare_wt.setText("0.0");
         edt_net_wt.setText("0.0");
         edtLotno.setText(lot_no);
@@ -691,7 +691,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mEditor.putString(Constants.txt_title6_sp, txt_title6.getText().toString());
         mEditor.putString(Constants.txt_title7_sp, txt_title7.getText().toString());
 
-        mEditor.putString(Constants.edt_gross_wt_sp, edt_gross_wt.getText().toString());
+        mEditor.putString(Constants.edt_gross_wt_sp, txt_gross_wt.getText().toString());
         mEditor.putString(Constants.edt_tare_wt_sp, edt_tare_wt.getText().toString());
         mEditor.putString(Constants.edt_net_wt_sp, edt_net_wt.getText().toString());
         mEditor.putString(Constants.edtLotno_sp, edtLotno.getText().toString());
