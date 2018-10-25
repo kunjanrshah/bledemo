@@ -38,8 +38,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -87,12 +89,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     };
     PendingResult<LocationSettingsResult> result;
     BluetoothDevice bluetoothDevice;
-    Button btnScan, btnTare;
-    private Button btncount;
+    private Button btnScan;
+    private Button btncount, btnTare,btnMode,btnInc,btnShift;
+    private Button btnR1, btnR2,btnR3,btnR4;
+    private Button btnF1, btnF2,btnF3;
     private int count = 0, isShow = 0;
+    private LinearLayout ll_calibrate;
     private SharedPreferences mSharedPreference;
     private BluetoothAdapter mBluetoothAdapter;
-    private EditText edt_gross_wt = null, edt_tare_wt = null, edt_net_wt = null, edtLotno = null, edtBaleno = null, edtMaterial = null;
+    private EditText  edt_net_wt = null, edtLotno = null, edtBaleno = null, edtMaterial = null, edt_tare_wt = null;
+    private TextView txt_gross_wt = null,txt_status=null;
     private TextClock textClock = null;
     private BluetoothLEService mBluetoothLEService;
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -103,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.e(TAG, "Unable to initialize Bluetooth");
                 finish();
             }
-            btnScan.setText("Connecting device...");
+            txt_status.setText("Connecting device...");
             btnTare.setEnabled(true);
             mBluetoothLEService.connect(bluetoothDevice.getAddress());
         }
@@ -143,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            btnScan.setText("Finding device");
+            txt_status.setText("Finding device");
             // if(bluetoothDevice.getAddress().equalsIgnoreCase("C8:FD:19:4B:1F:09"))
             //{
             if (mScanning) {
@@ -153,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
             }
-            btnScan.setText("Connecting device..");
+            txt_status.setText("Connecting device..");
             //  startScanning(false);
 
 
@@ -202,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                btnScan.setText(status);
+                txt_status.setText(status);
             }
         });
     }
@@ -215,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     output = output + Character.toString((char) data[i]);
                 }
                 if (count == 0) {
-                    edt_gross_wt.setText(output);
+                    txt_gross_wt.setText(output);
                 } else if (count == 1) {
                     dotAtLastEnd(output);
                 } else if (count == 2) {
@@ -224,8 +230,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     dotAtEnd_3(output);
                 }
                 Double net = 0.0d;
-                if (!edt_tare_wt.getText().toString().isEmpty() && !edt_gross_wt.getText().toString().isEmpty()) {
-                    net = Double.parseDouble(edt_gross_wt.getText().toString()) - Double.parseDouble(edt_tare_wt.getText().toString());
+                if (!edt_tare_wt.getText().toString().isEmpty() && !txt_gross_wt.getText().toString().isEmpty()) {
+                    net = Double.parseDouble(txt_gross_wt.getText().toString()) - Double.parseDouble(edt_tare_wt.getText().toString());
                 }
                 edt_net_wt.setText("" + df2.format(net));
             }
@@ -262,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (flag) {
                     output = "-".concat(output);
                 }
-                edt_gross_wt.setText(output);
+                txt_gross_wt.setText(output);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -295,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (flag) {
                     output1 = "-".concat(output1);
                 }
-                edt_gross_wt.setText("" + output1);
+                txt_gross_wt.setText("" + output1);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -328,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (flag) {
                     output1 = "-".concat(output1);
                 }
-                edt_gross_wt.setText("" + output1);
+                txt_gross_wt.setText("" + output1);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -379,6 +385,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mSharedPreference = getSharedPreferences("superb", MODE_PRIVATE);
         mEditor = mSharedPreference.edit();
         count = mSharedPreference.getInt("count", 0);
+        ll_calibrate= (LinearLayout) findViewById(R.id.ll_calibrate);
         textClock = (TextClock) findViewById(R.id.textClock);
         txtSrNo = (TextView) findViewById(R.id.txtSrNo);
         txt_title1 = (TextView) findViewById(R.id.txt_title1);
@@ -388,15 +395,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         txt_title5 = (TextView) findViewById(R.id.txt_title5);
         txt_title6 = (TextView) findViewById(R.id.txt_title6);
         txt_title7 = (TextView) findViewById(R.id.txt_title7);
-        edt_gross_wt = (EditText) findViewById(R.id.edt_gross_wt);
+        txt_status= (TextView) findViewById(R.id.txt_status);
+        txt_gross_wt = (TextView) findViewById(R.id.edt_gross_wt);
         edt_net_wt = (EditText) findViewById(R.id.edt_net_wt);
         edt_tare_wt = (EditText) findViewById(R.id.edt_tare_wt);
         edtLotno = (EditText) findViewById(R.id.edt_lotno);
         edtBaleno = (EditText) findViewById(R.id.edt_baleno);
         edtMaterial = (EditText) findViewById(R.id.edtMaterial);
         btnScan = (Button) findViewById(R.id.btnScan);
-        btnTare = (Button) findViewById(R.id.btnTare);
         btncount = (Button) findViewById(R.id.btncount);
+        btnTare = (Button) findViewById(R.id.btnTare);
+        btnMode = (Button) findViewById(R.id.btnMode);
+        btnInc = (Button) findViewById(R.id.btnInc);
+        btnShift = (Button) findViewById(R.id.btnShift);
+        btnR1 = (Button) findViewById(R.id.btnR1);
+        btnR2 = (Button) findViewById(R.id.btnR2);
+        btnR3 = (Button) findViewById(R.id.btnR3);
+        btnR4 = (Button) findViewById(R.id.btnR4);
+        btnF1 = (Button) findViewById(R.id.btnF1);
+        btnF2 = (Button) findViewById(R.id.btnF2);
+        btnF3 = (Button) findViewById(R.id.btnF3);
+
         txt_title1.setOnClickListener(this);
         txt_title2.setOnClickListener(this);
         txt_title3.setOnClickListener(this);
@@ -426,9 +445,123 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 } else {
                     Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
+
+
+        btnMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "M");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnInc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "I");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+        btnShift.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "S");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+        btnR1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "R1");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnR2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "R2");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnR3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "R3");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnR4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "R4");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnF1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "F1");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnF2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "F2");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnF3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mNotifyCharacteristic != null) {
+                    mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic, "F3");
+                } else {
+                    Toast.makeText(MainActivity.this, "Please connect again!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
         findViewById(R.id.btnNext).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -437,7 +570,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     mjsonobject.put(txt_title1.getText().toString(), txtSrNo.getText().toString());
                     mjsonobject.put(txt_title2.getText().toString(), edtLotno.getText().toString());
                     mjsonobject.put(txt_title3.getText().toString(), edtBaleno.getText().toString());
-                    mjsonobject.put(txt_title4.getText().toString(), edt_gross_wt.getText().toString());
+                    mjsonobject.put(txt_title4.getText().toString(), txt_gross_wt.getText().toString());
                     mjsonobject.put(txt_title5.getText().toString(), edt_tare_wt.getText().toString());
                     mjsonobject.put(txt_title6.getText().toString(), edt_net_wt.getText().toString());
                     mjsonobject.put(txt_title7.getText().toString(), edtMaterial.getText().toString());
@@ -524,9 +657,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 isShow++;
                 if (isShow > 4) {
                     btncount.setText("Count " + count);
-                    btncount.setVisibility(View.VISIBLE);
+                    ll_calibrate.setVisibility(View.VISIBLE);
                 } else {
-                    btncount.setVisibility(View.GONE);
+                    ll_calibrate.setVisibility(View.GONE);
                 }
             }
         });
@@ -537,7 +670,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
+        hideSoftKeyboard();
+    }
 
+
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     private void alert(String message, final String state) {
@@ -565,11 +706,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                             Log.d(TAG, "step btnSubmit");
                         } else if (state.equalsIgnoreCase("scan")) {
                             try {
-                                if (btnScan.getText().toString().equalsIgnoreCase("connected")) {
+                                if (txt_status.getText().toString().equalsIgnoreCase("connected")) {
                                     mBluetoothLEService.disconnect();
                                     mBluetoothLEService.close();
-                                    btnScan.setText("disconnected");
-                                    edt_gross_wt.setText("0.0");
+                                    txt_status.setText("disconnected");
+                                    txt_gross_wt.setText("0.0");
                                     edt_tare_wt.setText("0.0");
                                     edt_net_wt.setText("0.0");
                                     Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_SHORT).show();
@@ -670,7 +811,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         txt_title5.setText(title5);
         txt_title6.setText(title6);
         txt_title7.setText(title7);
-        edt_gross_wt.setText("0.0");
+        txt_gross_wt.setText("0.0");
         edt_tare_wt.setText("0.0");
         edt_net_wt.setText("0.0");
         edtLotno.setText(lot_no);
@@ -691,7 +832,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mEditor.putString(Constants.txt_title6_sp, txt_title6.getText().toString());
         mEditor.putString(Constants.txt_title7_sp, txt_title7.getText().toString());
 
-        mEditor.putString(Constants.edt_gross_wt_sp, edt_gross_wt.getText().toString());
+        mEditor.putString(Constants.edt_gross_wt_sp, txt_gross_wt.getText().toString());
         mEditor.putString(Constants.edt_tare_wt_sp, edt_tare_wt.getText().toString());
         mEditor.putString(Constants.edt_net_wt_sp, edt_net_wt.getText().toString());
         mEditor.putString(Constants.edtLotno_sp, edtLotno.getText().toString());
@@ -782,8 +923,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 @Override
                 public void run() {
                     mScanning = false;
-                    if (!btnScan.getText().toString().equalsIgnoreCase("connected")) {
-                        btnScan.setText("Scanning Stopped");
+                    if (!txt_status.getText().toString().equalsIgnoreCase("connected")) {
+                        txt_status.setText("Scanning Stopped");
                     }
                     if (bluetoothLeScanner != null) {
                         bluetoothLeScanner.stopScan(scanCallback);
@@ -792,7 +933,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }, Constants.SCAN_PERIOD);
 
             mScanning = true;
-            btnScan.setText("Scanning Started");
+            txt_status.setText("Scanning Started");
             if (bluetoothLeScanner != null) {
                 bluetoothLeScanner.startScan(scanFilters, settings, scanCallback);
             }
@@ -803,7 +944,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 @Override
                 public void run() {
                     mScanning = false;
-                    btnScan.setText("Scanning Stopped");
+                    txt_status.setText("Scanning Stopped");
                     if (bluetoothLeScanner != null) {
                         bluetoothLeScanner.stopScan(scanCallback);
                     }
