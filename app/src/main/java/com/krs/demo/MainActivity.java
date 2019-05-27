@@ -23,6 +23,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -35,16 +36,19 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -101,6 +105,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private TextView txt_gross_wt = null,txt_status=null;
     private TextClock textClock = null;
     private BluetoothLEService mBluetoothLEService;
+    private ToggleButton tgl_mode;
+    private ClientThread clientThread;
+    private Thread thread;
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
@@ -385,6 +392,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mSharedPreference = getSharedPreferences("superb", MODE_PRIVATE);
         mEditor = mSharedPreference.edit();
         count = mSharedPreference.getInt("count", 0);
+        tgl_mode= findViewById(R.id.tgl_mode);
+        tgl_mode.setText(null);
+        tgl_mode.setTextOn(null);
+        tgl_mode.setTextOff(null);
         ll_calibrate= (LinearLayout) findViewById(R.id.ll_calibrate);
         textClock = (TextClock) findViewById(R.id.textClock);
         txtSrNo = (TextView) findViewById(R.id.txtSrNo);
@@ -434,7 +445,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                alert("Are you sure for Scan?", "scan");
+                if(btnScan.getText().toString().equalsIgnoreCase("scan"))
+                {
+                    alert("Are you sure for Scan?", "scan");
+                }else
+                {
+                    String clientMessage = "listen,mac=raju";
+                    //   clientMessage="kunjan,10";
+                    //showMessage(clientMessage, Color.BLUE);
+                    if (null != clientThread) {
+                        clientThread.sendMessage(clientMessage);
+                        // edMsgSend.setText("data,mac=raju:weight=123");
+                    }
+                }
             }
         });
         btnTare.setOnClickListener(new View.OnClickListener() {
@@ -664,6 +687,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
+        tgl_mode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked)
+                    {
+                        btnScan.setText("Connect");
+                        txt_status.setText("Connecting to Server...");
+                        clientThread = new ClientThread(txt_status,txt_gross_wt);
+                        thread = new Thread(clientThread);
+                        thread.start();
+                        txt_status.setText("Connected to Server...");
+
+                    }else
+                    {
+                        btnScan.setText("Scan");
+                    }
+            }
+        });
+
         textClock.setFormat12Hour("dd/MM/yyyy hh:mm:ss a EEE");
         textClock.setFormat24Hour(null);
 
@@ -671,6 +713,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         StrictMode.setVmPolicy(builder.build());
 
         hideSoftKeyboard();
+
+        try {
+            WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+            String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+            Log.e(TAG, "Client ip: " + ip);
+            //  SERVER_IP=ip;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -1064,6 +1115,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         // show it
         alertDialog.show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (null != clientThread) {
+            clientThread.sendMessage("Disconnect");
+            clientThread = null;
+        }
     }
 
     @Override

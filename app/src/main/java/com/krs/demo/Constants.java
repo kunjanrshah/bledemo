@@ -31,6 +31,8 @@ public class Constants {
     public static final int REQUEST_LOCATION_ENABLE_CODE = 101;
 
     public static int SCAN_PERIOD = 10000;
+    public static final int SERVERPORT = 8090;
+    public static String SERVER_IP = "13.233.28.141";
 
     public static String txt_srvalue_sp="txt_srvalue";
     public static String txt_title1_sp="txt_title1";
